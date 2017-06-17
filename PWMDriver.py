@@ -1,8 +1,10 @@
+import smbus
+
 class PWMDriver:
 
-  def __init__(self, addr):
+  def __init__(self, addr, bus):
     self._i2caddr = addr
-
+    self.bus = bus
 
   def begin(self) :
    WIRE.begin()
