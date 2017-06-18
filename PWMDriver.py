@@ -2,17 +2,16 @@ import smbus
 
 class PWMDriver:
 
-  def __init__(self, addr, bus):
-    self._i2caddr = addr
+  def __init__(self, bus=smbus.SMBus(1)):
+    self._i2caddr = 0x40
     self.bus = bus
 
   def begin(self) :
-   WIRE.begin()
-   self.reset()
+    self.reset()
 
 
   def reset(self) :
-   self.write8(PCA9685_MODE1, 0x0)
+    self.write8(PCA9685_MODE1, 0x0)
    
 
   def setPWMFreq(self, freq) :
@@ -43,6 +42,10 @@ class PWMDriver:
   def setPWM(self, num, on, off) :
     #Serial.print("Setting PWM ") Serial.print(num) Serial.print(": ") Serial.print(on) Serial.print("->") Serial.println(off)
 
+    ledout_values = [on&0xFF, on>>8, off&0xFF, off>>8]
+    self.bus.write_i2c_block_data(self._i2caddr, LED0_ON_L+4*num, ledout_values)
+    
+    """
     WIRE.beginTransmission(self._i2caddr)
     WIRE.write(LED0_ON_L+4*num)
     WIRE.write(on)
@@ -50,12 +53,12 @@ class PWMDriver:
     WIRE.write(off)
     WIRE.write(off>>8)
     WIRE.endTransmission()
-   
+    """
 
   # Sets pin without having to deal with on/off tick placement and properly handles
   # a zero value as completely off.  Optional invert parameter supports inverting
   # the pulse for sinking to ground.  Val should be a value from 0 to 4095 inclusive.
-  def setPin(self, num, val, invert):
+  def setPin(self, num, val, invert=false):
     # Clamp value between 0 and 4095 inclusive.
     val = min(val, 4095)
     if (invert) :
@@ -84,17 +87,30 @@ class PWMDriver:
         setPWM(num, 0, val)
        
   def read8(self, addr):
+    """
     WIRE.beginTransmission(_i2caddr)
     WIRE.write(addr)
     WIRE.endTransmission()
 
     WIRE.requestFrom((uint8_t)_i2caddr, (uint8_t)1)
     return WIRE.read()
-
+    """
+    return self.bus.read_byte_data(self._i2caddr, addr)
 
   def write8(self, addr, d):
+    """
     WIRE.beginTransmission(_i2caddr)
     WIRE.write(addr)
     WIRE.write(d)
     WIRE.endTransmission()
+    """
+    self.bus.write_byte_data(self._i2caddr, addr, d)
+
+import time
+pwmdriver = PWMDriver()
+while True:
+    pwmdriver.setPin(2, 1024)
+    time.sleep(2)
+    pwmdriver.setPin(2, 3072)
+    time.sleep(2)
 
