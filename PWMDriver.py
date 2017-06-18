@@ -1,19 +1,28 @@
 import smbus
 import time
+import math
+
+PCA9685_MODE1 = 0x0
+PCA9685_PRESCALE = 0xFE
+
 
 class PWMDriver:
 
-  def __init__(self, bus=smbus.SMBus(1)):
+  def __init__(self, bus):
     self._i2caddr = 0x40
     self.bus = bus
 
   def begin(self) :
+    global PCA9685_MODE1
+    global PCA9685_PRESCALE
+
     self.reset()
+    self.setPWMFreq(1500)
 
 
   def reset(self) :
     self.write8(PCA9685_MODE1, 0x0)
-   
+    
 
   def setPWMFreq(self, freq) :
     #Serial.print("Attempting to set freq ")
@@ -25,17 +34,17 @@ class PWMDriver:
     self.prescaleval -= 1
     #Serial.print("Estimated pre-scale: ") Serial.println(prescaleval)
      
-    self.prescale = floor(prescaleval + 0.5)
+    self.prescale = math.floor(self.prescaleval + 0.5)
     #Serial.print("Final pre-scale: ") Serial.println(prescale)
      
     
-    self.oldmode = read8(PCA9685_MODE1)
-    self.newmode = (oldmode&0x7F) | 0x10 # sleep
-    self.write8(PCA9685_MODE1, newmode) # go to sleep
-    self.write8(PCA9685_PRESCALE, prescale) # set the prescaler
-    self.write8(PCA9685_MODE1, oldmode)
+    self.oldmode = self.read8(PCA9685_MODE1)
+    self.newmode = (self.oldmode&0x7F) | 0x10 # sleep
+    self.write8(PCA9685_MODE1, self.newmode) # go to sleep
+    self.write8(PCA9685_PRESCALE, self.prescale) # set the prescaler
+    self.write8(PCA9685_MODE1, self.oldmode)
     time.sleep(.005)
-    self.write8(PCA9685_MODE1, oldmode | 0xa1)  #  This sets the MODE1 register to turn on auto increment.
+    self.write8(PCA9685_MODE1, self.oldmode | 0xa1)  #  This sets the MODE1 register to turn on auto increment.
                                             # This is why the beginTransmission below was not working.
     #  Serial.print("Mode now 0x") Serial.println(read8(PCA9685_MODE1), HEX)
    
@@ -44,7 +53,7 @@ class PWMDriver:
     #Serial.print("Setting PWM ") Serial.print(num) Serial.print(": ") Serial.print(on) Serial.print("->") Serial.println(off)
 
     ledout_values = [on&0xFF, on>>8, off&0xFF, off>>8]
-    self.bus.write_i2c_block_data(self._i2caddr, LED0_ON_L+4*num, ledout_values)
+    self.bus.write_i2c_block_data(self._i2caddr, 0x06+4*num, ledout_values)
     
     """
     WIRE.beginTransmission(self._i2caddr)
@@ -59,33 +68,33 @@ class PWMDriver:
   # Sets pin without having to deal with on/off tick placement and properly handles
   # a zero value as completely off.  Optional invert parameter supports inverting
   # the pulse for sinking to ground.  Val should be a value from 0 to 4095 inclusive.
-  def setPin(self, num, val, invert=false):
+  def setPin(self, num, val, invert=False):
     # Clamp value between 0 and 4095 inclusive.
     val = min(val, 4095)
     if (invert) :
       if (val == 0) :
         # Special value for signal fully on.
-        setPWM(num, 4096, 0)
+        self.setPWM(num, 4096, 0)
        
       elif (val == 4095) :
         # Special value for signal fully off.
-        setPWM(num, 0, 4096)
+        self.setPWM(num, 0, 4096)
        
       else :
-        setPWM(num, 0, 4095-val)
+        self.setPWM(num, 0, 4095-val)
        
      
     else:
       if (val == 4095):
         # Special value for signal fully on.
-        setPWM(num, 4096, 0)
+        self.setPWM(num, 4096, 0)
        
       elif (val == 0):
         # Special value for signal fully off.
-        setPWM(num, 0, 4096)
+        self.setPWM(num, 0, 4096)
        
       else:
-        setPWM(num, 0, val)
+        self.setPWM(num, 0, val)
        
   def read8(self, addr):
     """
@@ -107,10 +116,14 @@ class PWMDriver:
     """
     self.bus.write_byte_data(self._i2caddr, addr, d)
 
-pwmdriver = PWMDriver()
+pwmdriver = PWMDriver(smbus.SMBus(1))
+pwmdriver.begin()
 while True:
-    pwmdriver.setPin(2, 1024)
-    time.sleep(2)
-    pwmdriver.setPin(2, 3072)
-    time.sleep(2)
+  for i in range(0,16):
+    pwmdriver.setPin(i, 1024)
+  print('set pins forward')
+  time.sleep(2)
+  for i in range(0, 16):
+    pwmdriver.setPin(i, 3072)
+  time.sleep(2)
 
