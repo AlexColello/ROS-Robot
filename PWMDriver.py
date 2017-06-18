@@ -1,4 +1,5 @@
 import smbus
+import time
 
 class PWMDriver:
 
@@ -33,7 +34,7 @@ class PWMDriver:
     self.write8(PCA9685_MODE1, newmode) # go to sleep
     self.write8(PCA9685_PRESCALE, prescale) # set the prescaler
     self.write8(PCA9685_MODE1, oldmode)
-    delay(5)
+    time.sleep(.005)
     self.write8(PCA9685_MODE1, oldmode | 0xa1)  #  This sets the MODE1 register to turn on auto increment.
                                             # This is why the beginTransmission below was not working.
     #  Serial.print("Mode now 0x") Serial.println(read8(PCA9685_MODE1), HEX)
@@ -106,7 +107,6 @@ class PWMDriver:
     """
     self.bus.write_byte_data(self._i2caddr, addr, d)
 
-import time
 pwmdriver = PWMDriver()
 while True:
     pwmdriver.setPin(2, 1024)
