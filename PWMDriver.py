@@ -34,7 +34,7 @@ class PWMDriver:
     self.prescaleval -= 1
     #Serial.print("Estimated pre-scale: ") Serial.println(prescaleval)
      
-    self.prescale = math.floor(self.prescaleval + 0.5)
+    self.prescale = int(math.floor(self.prescaleval + 0.5))
     #Serial.print("Final pre-scale: ") Serial.println(prescale)
      
     
@@ -52,19 +52,13 @@ class PWMDriver:
   def setPWM(self, num, on, off) :
     #Serial.print("Setting PWM ") Serial.print(num) Serial.print(": ") Serial.print(on) Serial.print("->") Serial.println(off)
 
+    register = 0x06+4*num 
     ledout_values = [on&0xFF, on>>8, off&0xFF, off>>8]
-    self.bus.write_i2c_block_data(self._i2caddr, 0x06+4*num, ledout_values)
-    print("Set pin {0} at address{2} to {1}".format(0x06+4*num, ledout_values, self._i2caddr)
+    print("Starting values of register {0} are {1}".format(register, self.bus.read_i2c_block_data(self._i2caddr, register)))
+    self.bus.write_i2c_block_data(self._i2caddr, register, ledout_values)
+    print("Current values of register {0} are {1}".format(register, self.bus.read_i2c_block_data(self._i2caddr, register)))
+    print("Set register {0} at address {2} to {1}".format(register, ledout_values, self._i2caddr))
     
-    """
-    WIRE.beginTransmission(self._i2caddr)
-    WIRE.write(LED0_ON_L+4*num)
-    WIRE.write(on)
-    WIRE.write(on>>8)
-    WIRE.write(off)
-    WIRE.write(off>>8)
-    WIRE.endTransmission()
-    """
 
   # Sets pin without having to deal with on/off tick placement and properly handles
   # a zero value as completely off.  Optional invert parameter supports inverting
@@ -119,12 +113,14 @@ class PWMDriver:
 
 pwmdriver = PWMDriver(smbus.SMBus(1))
 pwmdriver.begin()
+
 while True:
+  print("Set pins forward")
   for i in range(0,16):
-    pwmdriver.setPin(i, 1024)
-  print('set pins forward')
-  time.sleep(2)
-  for i in range(0, 16):
     pwmdriver.setPin(i, 3072)
+  time.sleep(2)
+  print("Set pins backwards")
+  for i in range(0, 16):
+    pwmdriver.setPin(i, 1024)
   time.sleep(2)
 
