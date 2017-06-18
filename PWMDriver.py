@@ -54,6 +54,7 @@ class PWMDriver:
 
     ledout_values = [on&0xFF, on>>8, off&0xFF, off>>8]
     self.bus.write_i2c_block_data(self._i2caddr, 0x06+4*num, ledout_values)
+    print("Set pin {0} at address{2} to {1}".format(0x06+4*num, ledout_values, self._i2caddr)
     
     """
     WIRE.beginTransmission(self._i2caddr)
