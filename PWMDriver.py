@@ -5,7 +5,7 @@ import RPi.GPIO as gpio
 
 
 class PWMDriver:
- 
+  FREQUENCY = 500
   PCA9685_MODE1 = 0x00
   PCA9685_PRESCALE = 0xFE
   PCA9685_RA_MODE2          = 0x01
@@ -37,7 +37,11 @@ class PWMDriver:
     self._i2caddr = 0x40
     self.bus = bus
     self.reset()
-    self.setPWMFreq(50)
+    self.setPWMFreq(self.FREQUENCY)
+
+    gpio.setmode(gpio.BCM)
+    gpio.setup(27, gpio.OUT)
+    
 
 
   def reset(self) :
