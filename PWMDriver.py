@@ -5,7 +5,7 @@ import RPi.GPIO as gpio
 
 
 class PWMDriver:
-  FREQUENCY = 500
+  FREQUENCY = 100
   PCA9685_MODE1 = 0x00
   PCA9685_PRESCALE = 0xFE
   PCA9685_RA_MODE2          = 0x01
@@ -131,10 +131,10 @@ pwmdriver = PWMDriver(smbus.SMBus(1))
 while True:
   print("Set pins forward")
   for i in range(0,13):
-    pwmdriver.setPin(i, 3072)
+    pwmdriver.setPin(i, 1100)
   time.sleep(2)
   print("Set pins backwards")
-  for i in range(0, 16):
-    pwmdriver.setPin(i, 1024)
+  for i in range(0, 13):
+    pwmdriver.setPin(i, 300)
   time.sleep(2)
 
