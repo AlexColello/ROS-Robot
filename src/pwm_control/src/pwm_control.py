@@ -2,7 +2,8 @@ import smbus
 import time
 import math
 import RPi.GPIO as gpio
-
+import rospy
+from stdmsgs.msg import Float32
 
 class PWMDriver:
 
@@ -114,17 +115,18 @@ class PWMDriver:
 
 pwmdriver = PWMDriver()
 
-while True:
-  print("Set pins forward")
+def callback(data):
+  rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
   for i in range(0,13):
-    pwmdriver.set_pin(i, .9)
-  time.sleep(2)
-  print("Set pins backwards")
-  for i in range(0, 13):
-    pwmdriver.set_pin(i, -1.0)
-  time.sleep(2)
-  print "Reset"
+    pwmdriver.set_pin(i, data)
+
+def pwm_control():
+  rospy.init_node('pwm_control', anonymous=True)
   pwmdriver.reset()
   pwmdriver.set_pwm_freq(pwmdriver.FREQUENCY)
-  time.sleep(2)
+  rospy.Subscriber("pwm_tester", Float32, callback)
+  rospy.spin()
+
+  if __name__ == '__main__':
+    pwm_control()
 
