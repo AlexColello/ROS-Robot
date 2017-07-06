@@ -1,0 +1,2 @@
+
+-DCATKIN_DEVEL_PREFIX=/home/erle/ROS-Robot/devel -DCMAKE_INSTALL_PREFIX=/home/erle/ROS-Robot/install -G Unix Makefiles
