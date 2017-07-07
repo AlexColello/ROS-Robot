@@ -1,9 +1,11 @@
+#!/usr/bin/env python
+
 import smbus
 import time
 import math
 import RPi.GPIO as gpio
 import rospy
-from stdmsgs.msg import Float32
+from std_msgs.msg import Float32
 
 class PWMDriver:
 
@@ -130,3 +132,4 @@ def pwm_control():
   if __name__ == '__main__':
     pwm_control()
 
+    
