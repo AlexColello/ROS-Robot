@@ -30,11 +30,9 @@ class PWMDriver:
     def __init__(self, bus=smbus.SMBus(1), addr=0x40):
           self._i2caddr = addr
           self.bus = bus
-          self.reset()
-          self.set_pwm_freq(self.FREQUENCY)
 
-          gpio.setmode(gpio.BCM)
-          gpio.setup(27, gpio.OUT)
+          #gpio.setmode(gpio.BCM)
+          #gpio.setup(27, gpio.OUT)
 
     def set_pwm_freq(self, freq) :
           print "Attempting to set freq ", freq
@@ -111,11 +109,10 @@ pwmdriver = PWMDriver()
 def callback(data):
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
     for i in range(0,13):
-        pwmdriver.set_pin(i, data)
+        pwmdriver.set_pin(i, data.data)
         
 def pwm_control():
     rospy.init_node('pwm_control', anonymous=True)
-    pwmdriver.reset()
     pwmdriver.set_pwm_freq(pwmdriver.FREQUENCY)
     rospy.Subscriber("pwm_tester", Float32, callback)
     rospy.spin()
