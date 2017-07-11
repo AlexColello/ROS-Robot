@@ -9,12 +9,14 @@ from std_msgs.msg import Float32
 
 class PWMDriver:
 
-    FREQUENCY = 100
-    PRESCALE_MODIFIER = 0.983
-    JAGUAR_MAX_DUTY_CYCLE = 1100
-    JAGUAR_MIN_DUTY_CYCLE = 300
-    JAGUAR_MAX_DEADBAND = 750
-    JAGUAR_MIN_DEADBAND = 650
+    FREQUENCY = 200.0
+    PRESCALE_MODIFIER = 1.05
+    #To calculate the length of the pulse, use the formula:
+    #Length in ms = 1000 / frequency(hz) * value / 4096
+    JAGUAR_MAX_DUTY_CYCLE = 1853 #2.304 ms at 200 hz
+    JAGUAR_MIN_DUTY_CYCLE = 560 #0.691 ms at 200 hz
+    JAGUAR_MAX_DEADBAND = 1247 #1.551 ms at 200 hz
+    JAGUAR_MIN_DEADBAND = 1165 #1.448 ms at 200 hz
 
 
     PRESCALE          = 0xFE
@@ -36,9 +38,9 @@ class PWMDriver:
 
     def set_pwm_freq(self, freq) :
           print "Attempting to set freq ", freq
-          self.prescaleval = int(math.ceil(25000000 * self.PRESCALE_MODIFIER / (4096 * freq))) - 1
+          self.prescaleval = int(math.ceil(25000000.0 * self.PRESCALE_MODIFIER / (4096.0 * freq))) - 1
           print "Final pre-scale: " , self.prescaleval
-
+          
           self.write8(self.RA_ALL_LED_OFF_H, self.ALL_LED_OFF_H_SHUT) # shutdown before sleeping
           self.write8(self.RA_MODE1, self.MODE1_SLEEP_BIT) # go to sleep
           self.write8(self.PRESCALE, self.prescaleval) # set the prescaler
@@ -50,9 +52,9 @@ class PWMDriver:
 
           register = 0x06+4*(num + 3)
           ledout_values = [on&0xFF, on>>8, off&0xFF, off>>8]
-          print("Starting values of register {0} are {1}".format(register, self.bus.read_i2c_block_data(self._i2caddr, register)))
+          #print("Starting values of register {0} are {1}".format(register, self.bus.read_i2c_block_data(self._i2caddr, register)))
           self.bus.write_i2c_block_data(self._i2caddr, register, ledout_values)
-          print("Current values of register {0} are {1}".format(register, self.bus.read_i2c_block_data(self._i2caddr, register)))
+          #print("Current values of register {0} are {1}".format(register, self.bus.read_i2c_block_data(self._i2caddr, register)))
           print("Set register {0} at address {2} to {1}".format(register, ledout_values, self._i2caddr))
 
 
