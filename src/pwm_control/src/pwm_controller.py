@@ -5,7 +5,7 @@ import time
 import math
 import RPi.GPIO as gpio
 import rospy
-from std_msgs.msg import Float32
+from std_msgs.msg import Float32MultiArray
 
 class PWMDriver:
 
@@ -111,12 +111,12 @@ pwmdriver = PWMDriver()
 def callback(data):
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
     for i in range(0,13):
-        pwmdriver.set_pin(i, data.data)
+        pwmdriver.set_pin(i, data.data[i])
         
 def pwm_control():
     rospy.init_node('pwm_control', anonymous=True)
     pwmdriver.set_pwm_freq(pwmdriver.FREQUENCY)
-    rospy.Subscriber("pwm_tester", Float32, callback)
+    rospy.Subscriber("pwm_tester", Float32MultiArray, callback)
     rospy.spin()
 
 if __name__ == '__main__':
