@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(teleoperated_control_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT " " STREQUAL " ")
+if(NOT "/home/erle/ROS-Robot/devel/include " STREQUAL " ")
   set(teleoperated_control_INCLUDE_DIRS "")
-  set(_include_dirs "")
+  set(_include_dirs "/home/erle/ROS-Robot/devel/include")
   foreach(idir ${_include_dirs})
     if(IS_ABSOLUTE ${idir} AND IS_DIRECTORY ${idir})
       set(include ${idir})
@@ -145,7 +145,7 @@ foreach(library ${libraries})
   endif()
 endforeach()
 
-set(teleoperated_control_EXPORTED_TARGETS "")
+set(teleoperated_control_EXPORTED_TARGETS "teleoperated_control_generate_messages_cpp;teleoperated_control_generate_messages_eus;teleoperated_control_generate_messages_lisp;teleoperated_control_generate_messages_nodejs;teleoperated_control_generate_messages_py")
 # create dummy targets for exported code generation targets to make life of users easier
 foreach(t ${teleoperated_control_EXPORTED_TARGETS})
   if(NOT TARGET ${t})
@@ -153,7 +153,7 @@ foreach(t ${teleoperated_control_EXPORTED_TARGETS})
   endif()
 endforeach()
 
-set(depends "")
+set(depends "rospy;sensor_msgs;message_runtime")
 foreach(depend ${depends})
   string(REPLACE " " ";" depend_list ${depend})
   # the package name of the dependency must be kept in a unique variable so that it is not overwritten in recursive calls
@@ -182,7 +182,7 @@ foreach(depend ${depends})
   list(APPEND teleoperated_control_EXPORTED_TARGETS ${${teleoperated_control_dep}_EXPORTED_TARGETS})
 endforeach()
 
-set(pkg_cfg_extras "")
+set(pkg_cfg_extras "teleoperated_control-msg-extras.cmake")
 foreach(extra ${pkg_cfg_extras})
   if(NOT IS_ABSOLUTE ${extra})
     set(extra ${teleoperated_control_DIR}/${extra})

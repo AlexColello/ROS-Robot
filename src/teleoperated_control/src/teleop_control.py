@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import rospy
-from sensor_msgs import Joy
-from std_msgs.msg import Float32MultiArray
+from sensor_msgs.msg import Joy
+from teleoperated_control.msg import DriveSpeeds
 
 class TeleopDrive:
         
@@ -23,32 +23,32 @@ class TeleopDrive:
         if moveValue > 0.0:
             if rotateValue > 0.0:
                 leftMotorSpeed = moveValue - rotateValue
-                rightMotorSpeed = Math.max(moveValue, rotateValue)
+                rightMotorSpeed = max(moveValue, rotateValue)
             else:
-                leftMotorSpeed = Math.max(moveValue, -rotateValue)
+                leftMotorSpeed = max(moveValue, -rotateValue)
                 rightMotorSpeed = moveValue + rotateValue
         else:
             if rotateValue > 0.0:
-                leftMotorSpeed = -Math.max(-moveValue, rotateValue)
+                leftMotorSpeed = -max(-moveValue, rotateValue)
                 rightMotorSpeed = moveValue + rotateValue
             else:
                 leftMotorSpeed = moveValue - rotateValue
-                rightMotorSpeed = -Math.max(-moveValue, -rotateValue)
+                rightMotorSpeed = -max(-moveValue, -rotateValue)
 
         return leftMotorSpeed, rightMotorSpeed
 
 
-    def callback(self,data):
+    def callback(self, data):
         x = data.axes[2]
         y = data.axes[3]
-        left_motor, right_motor = calc_arcade_drive(y, x)
-        self.pub.publish([left_motor, right_motor, 0,0,0,0,0,0,0,0,0,0,0])
+        left_motor, right_motor = self.calc_arcade_drive(y, x)
+        self.pub.publish(left_motor, right_motor)
 
     def __init__(self):
-        self.pub = rospy.Publisher('pwm_tester', Float32MultiArray, queue_size=10)
+        self.pub = rospy.Publisher('pwm_tester', DriveSpeeds, queue_size=10)
         rospy.init_node('pwm_tester', anonymous=True)
-        rospy.Subscriber('joy_node', Joy, callback)
-        self.pub.publish([0,0,0,0,0,0,0,0,0,0,0,0,0])
+        rospy.Subscriber('joy', Joy, self.callback)
+        self.pub.publish(0.0,0.0)
         rospy.spin()
 
 if __name__ == '__main__':

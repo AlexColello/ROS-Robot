@@ -3,6 +3,6 @@ prefix=/home/erle/ROS-Robot/devel
 Name: teleoperated_control
 Description: Description of teleoperated_control
 Version: 0.0.0
-Cflags: 
+Cflags: -I/home/erle/ROS-Robot/devel/include
 Libs: -L/home/erle/ROS-Robot/devel/lib 
-Requires: 
+Requires: rospy sensor_msgs message_runtime
