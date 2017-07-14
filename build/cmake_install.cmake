@@ -116,6 +116,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
+  include("/home/erle/ROS-Robot/build/motor_control/cmake_install.cmake")
   include("/home/erle/ROS-Robot/build/pwm_control/cmake_install.cmake")
   include("/home/erle/ROS-Robot/build/teleoperated_control/cmake_install.cmake")
 

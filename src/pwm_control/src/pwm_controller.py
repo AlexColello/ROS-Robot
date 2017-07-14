@@ -6,6 +6,7 @@ import math
 import RPi.GPIO as gpio
 import rospy
 from teleoperated_control.msg import DriveSpeeds
+from pwm_control.msg import PWMValues
 
 class PWMDriver:
 
@@ -106,17 +107,16 @@ class PWMDriver:
     def write8(self, addr, d):
         self.bus.write_byte_data(self._i2caddr, addr, d)
 
-pwmdriver = PWMDriver()
-
-def callback(data):
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s and %s", data.left_speed, data.right_speed)
-    pwmdriver.set_pin(0, data.left_speed)
-    pwmdriver.set_pin(1, data.right_speed)
+    def callback(self, data):
+        for i in range(0,13):
+            rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.outputs[i])
+            self.set_pin(i, data.outputs[i])
         
 def pwm_control():
-    rospy.init_node('pwm_control', anonymous=True)
+    pwmdriver = PWMDriver()
+    rospy.init_node('pwm_control')
     pwmdriver.set_pwm_freq(pwmdriver.FREQUENCY)
-    rospy.Subscriber("pwm_tester", DriveSpeeds, callback)
+    rospy.Subscriber("pwm_control", PWMValues, pwmdriver.callback)
     rospy.spin()
 
 if __name__ == '__main__':

@@ -45,8 +45,8 @@ class TeleopDrive:
         self.pub.publish(left_motor, right_motor)
 
     def __init__(self):
-        self.pub = rospy.Publisher('pwm_tester', DriveSpeeds, queue_size=10)
-        rospy.init_node('pwm_tester', anonymous=True)
+        self.pub = rospy.Publisher('teleop_control', DriveSpeeds, queue_size=10)
+        rospy.init_node('teleop_control')
         rospy.Subscriber('joy', Joy, self.callback)
         self.pub.publish(0.0,0.0)
         rospy.spin()

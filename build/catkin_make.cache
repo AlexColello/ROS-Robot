@@ -1,2 +1,2 @@
-pwm_control:teleoperated_control
+motor_control:pwm_control:teleoperated_control
 -DCATKIN_DEVEL_PREFIX=/home/erle/ROS-Robot/devel -DCMAKE_INSTALL_PREFIX=/home/erle/ROS-Robot/install -G Unix Makefiles

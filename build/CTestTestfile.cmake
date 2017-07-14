@@ -4,5 +4,6 @@
 # 
 # This file includes the relevant testing commands required for 
 # testing this directory and lists subdirectories to be tested as well.
+subdirs(motor_control)
 subdirs(pwm_control)
 subdirs(teleoperated_control)
