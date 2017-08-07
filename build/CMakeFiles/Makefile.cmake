@@ -13,6 +13,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "catkin/catkin_generated/version/package.cmake"
   "catkin_generated/installspace/_setup_util.py"
   "catkin_generated/order_packages.cmake"
+  "motor_control/catkin_generated/ordered_paths.cmake"
   "motor_control/catkin_generated/package.cmake"
   "pwm_control/catkin_generated/package.cmake"
   "pwm_control/catkin_generated/pwm_control-msg-extras.cmake.develspace.in"

@@ -108,7 +108,7 @@ class PWMDriver:
         self.bus.write_byte_data(self._i2caddr, addr, d)
 
     def callback(self, data):
-        for i in range(0,13):
+        for i in range(0,12):
             rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.outputs[i])
             self.set_pin(i, data.outputs[i])
         
